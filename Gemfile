@@ -42,6 +42,7 @@ gem "rsa", "~> 0.1.4"
 gem "exceptional", "~> 2.0.32"
 gem "newrelic_rpm", "~> 3.3.1"
 gem "draper", "~> 0.11.1"
+gem 'gettext_i18n_rails', "~> 0.6.6"
 
 # background job queue
 gem "delayed_job", :git => "git://github.com/collectiveidea/delayed_job.git", :tag => "v2.1.4"
@@ -61,6 +62,8 @@ group :development, :test do
   gem "launchy", "~> 2.0.5"
   gem "minitest", "~> 2.12.1"
   gem "quiet_assets", "~> 1.0.0"
+  gem 'gettext', '>=1.9.3', :require => false
+  gem 'ruby_parser', :require => false
 end
 
 group :test do

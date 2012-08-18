@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   helper_method :title
   helper_method :set_pagination_buttons
 
+  before_filter :set_gettext_locale
+
   protected
 
   # This incredibly useful helper gives us the currently logged in user. We
