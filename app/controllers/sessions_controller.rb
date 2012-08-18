@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   def new
-    @title = "sign in"
+    @title = _("sign in")
     redirect_to root_path && return if logged_in?
   end
 
@@ -27,7 +27,7 @@ class SessionsController < ApplicationController
         if params[:password].length > 0
           @user.save
           session[:user_id] = @user.id
-          flash[:notice] = "Thanks for signing up!"
+          flash[:notice] = _("Thanks for signing up!")
           redirect_to root_path
           return
         else
@@ -39,20 +39,18 @@ class SessionsController < ApplicationController
     else
       if user = User.authenticate(params[:username], params[:password])
         session[:user_id] = user.id
-        flash[:notice] = "Login successful."
+        flash[:notice] = _("Login successful.")
         redirect_to root_path
         return
       end
-      flash[:error] = "The password given for username \"#{params[:username]}\" is incorrect.
-
-      If you are trying to create a new account, please choose a different username."
+      flash[:error] = _('The password given for username "%{username}" is incorrect. If you are trying to create a new account, please choose a different username.') % {:username => params[:username]}
       render :new
     end
   end
 
   def destroy
     session[:user_id] = nil
-    flash[:notice] = "You've been logged out."
+    flash[:notice] = _("You've been logged out.")
     redirect_to root_path
   end
 

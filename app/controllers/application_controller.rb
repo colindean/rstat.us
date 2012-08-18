@@ -118,7 +118,7 @@ private
   end
 
   def redirect_with_sorry(opts)
-    flash[:error] = "Sorry, buddy"
+    flash[:error] = _("Sorry, buddy")
     redirect_to opts[:return]
   end
 

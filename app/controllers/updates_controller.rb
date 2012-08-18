@@ -3,7 +3,7 @@ class UpdatesController < ApplicationController
   before_filter :require_user, :only => [:timeline, :replies]
 
   def index
-    @title = "updates"
+    @title = _("updates")
     @list_class = "all"
 
     respond_to do |format|
@@ -55,7 +55,7 @@ class UpdatesController < ApplicationController
       # tell hubs there is a new entry
       current_user.feed.ping_hubs
 
-      flash[:notice] = "Update created."
+      flash[:notice] = _("Update created.")
     end
 
     if request.referrer
@@ -72,10 +72,10 @@ class UpdatesController < ApplicationController
     if update.author == current_user.author
       update.destroy
 
-      flash[:notice] = "Update Deleted!"
+      flash[:notice] = _("Update Deleted!")
       redirect_to root_path
     else
-      flash[:error] = "I'm afraid I can't let you do that, #{current_user.username}."
+      flash[:error] = _("I'm afraid I can't let you do that, %{username}.") % { :username => current_user.username }
       redirect_to :back
     end
   end

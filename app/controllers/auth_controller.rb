@@ -41,7 +41,7 @@ class AuthController < ApplicationController
         # Everyone is redirected to /users/new to confirm that they'd like
         # to have their username.
         if User.first :username => auth['info']['nickname']
-          flash[:error] = "Sorry, someone else has that username. Please pick another."
+          flash[:error] = _("Sorry, someone else has that username. Please pick another.")
         end
 
         redirect_to new_user_path
@@ -60,27 +60,23 @@ class AuthController < ApplicationController
 
     session[:user_id] = @auth.user.id
 
-    flash[:notice] = "You're now logged in."
+    flash[:notice] = _("You're now logged in.")
 
     redirect_to root_path
   end
 
   def invalid_auth_provider
-    flash[:error] = "We were unable to use your credentials because we do not support logging in with #{params[:provider]}."
+    flash[:error] = _("We were unable to use your credentials because we do not support logging in with %{provider}.") % {:provider => params[:provider] }
     redirect_to new_session_url
   end
 
   def failure
     if params[:message] == "invalid_credentials"
-      flash[:error] = "We were unable to use your credentials to log you in. " +
-                      "Try again?"
+      flash[:error] = _("We were unable to use your credentials to log you in. Try again?")
     elsif params[:message] == "timeout"
-      flash[:error] = "We were unable to use your credentials because of a timeout. " +
-                      "This is likely a temporary problem so feel free to try again."
+      flash[:error] = _("We were unable to use your credentials because of a timeout. This is likely a temporary problem so feel free to try again.")
     else
-      flash[:error] = "We were unable to use your credentials because of a yet " +
-                      "undetermined problem. Hopefully this is temporary so " +
-                      "feel free to try again."
+      flash[:error] = _("We were unable to use your credentials because of a yet undetermined problem. Hopefully this is temporary so feel free to try again.")
     end
 
     redirect_to new_session_url

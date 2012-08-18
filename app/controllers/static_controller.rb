@@ -5,14 +5,14 @@ class StaticController < ApplicationController
   end
 
   def open_source
-    @title = "open source"
+    @title = _("open source")
   end
 
   def about
-    @title = "about us"
+    @title = _("about us")
   end
 
   def contact
-    @title = "contact us"
+    @title = _("contact us")
   end
 end

@@ -2,12 +2,12 @@ class UsersController < ApplicationController
   before_filter :find_user, :only => [:show, :edit, :update, :feed, :following, :followers]
 
   def index
-    @title = "users"
+    @title = _("users")
     set_params_page
     begin
       @authors = Author.search(params)
     rescue RegexpError
-      flash[:error] = "Please enter a valid search term"
+      flash[:error] = _("Please enter a valid search term")
       redirect_to users_path and return
     end
     unless @authors.empty?
@@ -60,15 +60,15 @@ class UsersController < ApplicationController
 
         unless @user.email.blank? || @user.email_confirmed
           Notifier.send_confirm_email_notification(@user.email, @user.create_token)
-          flash[:notice] = "A link to confirm your updated email address has been sent to #{@user.email}."
+          flash[:notice] = _("A link to confirm your updated email address has been sent to %{email}.") % { :email => @user.email }
         else
-          flash[:notice] = "Profile saved!"
+          flash[:notice] = _("Profile saved!")
         end
 
         redirect_to user_path(params[:id])
 
       else
-        flash[:error] = "Profile could not be saved: #{response}"
+        flash[:error] = _("Profile could not be saved: %{response}") % { :response => response }
         render :edit
       end
     else
@@ -92,7 +92,7 @@ class UsersController < ApplicationController
     if @user.save
       Authorization.create_from_session!(session, @user)
 
-      flash[:notice] = "Thanks! You're all signed up with #{@user.username} for your username."
+      flash[:notice] = _("Thanks! You're all signed up with %{username} for your username.") % { :username => @user.username }
       session[:user_id] = @user.id
       redirect_to root_path
     else
@@ -131,9 +131,9 @@ class UsersController < ApplicationController
       @authors = @feeds.map{|f| f.author}
 
       if @user == current_user
-        title = "You're following"
+        title = _("You're following")
       else
-        title = "@#{@user.username} is following"
+        title = _("@%{username} is following") % { :username => @user.username }
       end
 
       respond_to do |format|
@@ -165,9 +165,9 @@ class UsersController < ApplicationController
 
       #build title
       if @user == current_user
-        title = "Your followers"
+        title = _("Your followers")
       else
-        title = "@#{@user.username}'s followers"
+        title = _("@%{username}'s followers") % { :username => @user.username }
       end
 
       render "users/list", :locals => {:title => title, :list_class => "followers"}
@@ -183,17 +183,17 @@ class UsersController < ApplicationController
   def confirm_email
     user = User.first(:perishable_token => params[:token])
     if user.nil?
-      flash[:error] = "Can't find User Account for this link."
+      flash[:error] = _("Can't find User Account for this link.")
       redirect_to root_path
     elsif user.token_expired?
-      flash[:error] = "Your link is no longer valid, please request a new one."
+      flash[:error] = _("Your link is no longer valid, please request a new one.")
       redirect_to root_path
     else
       user.email_confirmed = true
       user.reset_perishable_token
       # Register a session for the user
       session[:user_id] = user.id
-      flash[:notice] = "Email successfully confirmed."
+      flash[:notice] = _("Email successfully confirmed.")
       redirect_to root_path
     end
   end
@@ -211,14 +211,14 @@ class UsersController < ApplicationController
   # confirmation page to prevent repost issues
   def forgot_password_create
     unless params[:email] =~ /^([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})$/i
-      flash[:error] = "You didn't enter a correct email address. Please check your email and try again."
+      flash[:error] = _("You didn't enter a correct email address. Please check your email and try again.")
       return render "login/forgot_password"
     end
 
     user = User.first(:email => params[:email])
 
     if user.nil?
-      flash[:error] = "Your account could not be found, please check your email and try again."
+      flash[:error] = _("Your account could not be found, please check your email and try again.")
       render "login/forgot_password"
     else
       Notifier.send_forgot_password_notification(user.email, user.create_token)
@@ -259,13 +259,13 @@ class UsersController < ApplicationController
       # XXX: yes, this is a code smell
 
       if params[:password].size == 0
-        flash[:error] = "Password must be present"
+        flash[:error] = _("Password must be present")
         redirect_to reset_password_path(params[:token])
         return
       end
 
       if params[:password] != params[:password_confirm]
-        flash[:error] = "Passwords do not match"
+        flash[:error] = _("Passwords do not match")
         redirect_to reset_password_path(params[:token])
         return
       end
@@ -274,7 +274,7 @@ class UsersController < ApplicationController
       # without an email... look into this and remove this code if so.
       if user.email.nil?
         if params[:email].empty?
-          flash[:error] = "Email must be provided"
+          flash[:error] = _("Email must be provided")
           redirect_to reset_password_path(params[:token])
           return
         else
@@ -284,7 +284,7 @@ class UsersController < ApplicationController
 
       user.password = params[:password]
       user.save
-      flash[:notice] = "Password successfully set"
+      flash[:notice] = _("Password successfully set")
       redirect_to root_path
     else
       redirect_to forgot_password_path
@@ -297,7 +297,7 @@ class UsersController < ApplicationController
   def reset_password_with_token
     user = User.first(:perishable_token => params[:token])
     if user.nil? || user.token_expired?
-      flash[:error] = "Your link is no longer valid, please request a new one."
+      flash[:error] = _("Your link is no longer valid, please request a new one.")
       redirect_to forgot_password_path
     else
       @token = params[:token]

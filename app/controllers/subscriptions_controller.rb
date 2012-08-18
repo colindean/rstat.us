@@ -36,12 +36,12 @@ class SubscriptionsController < ApplicationController
       redirect_to request.referrer
     elsif !current_user.following_url? @feed.url
       # If we're not following them, noop.
-      flash[:notice] = "You're not following #{@author.username}."
+      flash[:notice] = _("You're not following %{username}.") % { :username => @author.username }
       redirect_to request.referrer
     else
       current_user.unfollow! @feed
 
-      flash[:notice] = "No longer following #{@author.username}."
+      flash[:notice] = _("No longer following %{username}.") % { :username => @author.username }
       redirect_to request.referrer
     end
   end
@@ -66,14 +66,14 @@ class SubscriptionsController < ApplicationController
     rescue RstatUs::InvalidSubscribeTo => e
       # This means the user's entry was neither a webfinger identifier
       # nor a feed URL, and calling `open` on it did not return anything.
-      flash[:error] = "There was a problem following #{params[:subscribe_to]}. Please specify the whole ID for the person you would like to follow, including both their username and the domain of the site they're on. It should look like an email address-- for example, username@status.net"
+      flash[:error] = _("There was a problem following %{feed}. Please specify the whole ID for the person you would like to follow, including both their username and the domain of the site they're on. It should look like an email address-- for example, username@status.net") % { :feed => params[:subscribe_to] }
       redirect_to request.referrer
       return
     end
 
     # Stop and return a nice message if already following this feed
     if current_user.following_feed? subscribe_to_feed
-      flash[:notice] = "You're already following #{subscribe_to_feed.author.username}."
+      flash[:notice] = _("You're already following %{username}.") % { :username => subscribe_to_feed.author.username }
       redirect_to request.referrer
       return
     end
@@ -82,7 +82,7 @@ class SubscriptionsController < ApplicationController
     f = current_user.follow! subscribe_to_feed
 
     unless f
-      flash[:error] = "There was a problem following #{params[:subscribe_to]}."
+      flash[:error] = _("There was a problem following %{feed}.") % { :feed => params[:subscribe_to] }
       redirect_to request.referrer
       return
     end
@@ -95,7 +95,7 @@ class SubscriptionsController < ApplicationController
       sub.subscribe(hub_url, true, f.verify_token)
     end
 
-    flash[:notice] = "Now following #{f.author.username}."
+    flash[:notice] = _("Now following %{username}.") % { :username => f.author.username }
     redirect_to request.referrer
   end
 
