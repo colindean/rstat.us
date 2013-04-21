@@ -67,6 +67,23 @@ describe Update do
       end
     end
 
+    describe "existing user with a domain in a remote post"
+      it "makes a link (before create)" do
+        @author = Fabricate(:author, :username => "steveklabnik",
+                                   :domain => "identi.ca",
+                                   :remote_url => 'http://identi.ca/steveklabnik')
+        u = Fabricate.build(:update, :text => "This is a message mentioning @SteveKlabnik@identi.ca.")
+        assert_match /<a href='#{@author.url}'>@SteveKlabnik@identi.ca<\/a>/, u.to_html
+      end
+
+      it "makes a link (after create)" do
+        @author = Fabricate(:author, :username => "steveklabnik",
+                                   :domain => "identi.ca",
+                                   :remote_url => 'http://identi.ca/steveklabnik')
+        u = Fabricate(:update, :text => "This is a message mentioning @SteveKlabnik@identi.ca.")
+        assert_match /<a href='#{@author.url}'>@SteveKlabnik@identi.ca<\/a>/, u.to_html
+      end
+
     describe "existing user mentioned in the middle of the word" do
       before do
         Fabricate(:user, :username => "steveklabnik")
